@@ -40,12 +40,21 @@ app.get('/api/health', (req: express.Request, res: express.Response) => {
     res.json({ status: 'OK', message: 'E-commerce API is running' });
 });
 
-// Create database tables and start the server
-initDb().then(() => {
-    app.listen(PORT, () => {
-        console.log(`Server is running on port ${PORT}`);
-    });
-}).catch(err => {
-    console.error('Failed to initialize database on startup:', err);
-    process.exit(1);
+app.get('/', (req: express.Request, res: express.Response) => {
+    res.json({ message: 'Qbit E-commerce API is Active. Welcome to the backend!' });
 });
+
+// Create database tables asynchronously (Serverless safe)
+initDb().catch(err => {
+    console.error('Failed to initialize database:', err);
+});
+
+// Start the server locally
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server is running locally on port ${PORT}`);
+    });
+}
+
+// ⚠️ REQUIRED FOR VERCEL SERVERLESS: Export the Express app
+export default app;
